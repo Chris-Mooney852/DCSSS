@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'">
+  <title>DCSS Deck</title>
+  <link rel="stylesheet" href="launcher.css">
+</head>
+<body>
+  <main>
+    <h1>DCSS Deck</h1>
+    <p class="sub">Pick a webtiles server. D-pad or left stick to move, A to select. View + Menu returns here at any time.</p>
+    <ul id="servers"></ul>
+    <form id="custom">
+      <input id="custom-url" type="url" placeholder="Custom server URL (Steam + X for keyboard)">
+      <button type="submit">Connect</button>
+    </form>
+    <button id="quit" class="quit">Quit</button>
+  </main>
+  <script src="launcher.js"></script>
+</body>
+</html>
