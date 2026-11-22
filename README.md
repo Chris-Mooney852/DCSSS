@@ -10,6 +10,9 @@ webtiles, built for the Steam Deck.
   entry), based on the game's own webtiles protocol messages.
 - Steam Input works fully: remap buttons, back paddles and gyro in Steam's layout editor.
 
+> **Known issue:** offline play currently fails to start on the Steam Deck
+> ([#1](https://github.com/Chris-Mooney852/DCSSS/issues/1)). Online play works.
+
 This is an unofficial fan project and is not affiliated with the DCSS dev team.
 See [docs/CONTROLS.md](docs/CONTROLS.md) for the default layout.
 
@@ -63,12 +66,24 @@ npm run dist       # release/DCSS-Deck-<version>-x86_64.AppImage (~180 MB)
 No Steamworks account is needed.
 
 1. In **Desktop Mode**, download the AppImage. CI uploads one for every push, under
-   the **Actions** tab. Right-click it → Properties → Permissions → mark it executable.
+   the **Actions** tab (you need to be signed in to GitHub to download it). Extract
+   the zip, then right-click the AppImage → Properties → Permissions → mark it executable.
 2. In Steam: **Games → Add a Non-Steam Game to My Library**, and pick the AppImage.
-3. Back in **Game Mode**, launch it from your library. It runs fullscreen on the Deck.
-   **Play offline** needs no internet. Saves live in `~/.local/share/dcss-deck/`.
-4. Optional: in the game's controller settings, start from the **Gamepad** template and
-   remap anything you like.
+3. **Set the launch option.** In Steam, open the game's **Properties → General → Launch
+   Options** and enter:
+   ```
+   GTK_IM_MODULE=simple %command%
+   ```
+   Without it, every letter typed with the Steam on-screen keyboard appears twice in
+   Game Mode. This affects Electron AppImages generally; see
+   [Heroic #4250](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher/issues/4250).
+4. Back in **Game Mode**, launch it from your library. It runs fullscreen on the Deck.
+   Saves live in `~/.local/share/dcss-deck/`.
+   **Play offline** is currently broken on the Deck
+   ([#1](https://github.com/Chris-Mooney852/DCSSS/issues/1)); online play works.
+5. In the game's controller settings (Steam button → Controller settings), make sure a
+   **Gamepad** template is selected; a keyboard/mouse layout hides the controller from
+   the app. Then remap anything you like.
 
 To iterate faster, enable SSH on the Deck (`passwd`, then `sudo systemctl enable --now sshd`)
 and `scp` new builds across.
