@@ -5,6 +5,15 @@ directories:
 files:
   - dist/**
   - package.json
+# Offline play: run scripts/bundle-offline.sh first (CI does). See src/main/paths.ts.
+extraResources:
+  - from: bundle/crawl
+    to: crawl
+  - from: bundle/python
+    to: python
+  - from: server
+    to: server
+    filter: ["**/*", "!__pycache__"]
 linux:
   target:
     - target: AppImage

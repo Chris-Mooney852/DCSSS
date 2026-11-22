@@ -72,14 +72,25 @@ Problems found and fixed during the spike:
 - Make **Play offline** the first, default entry. Online servers go below it.
 - Show the build's version.
 
-### 5. Packaging (CI)
-- Build crawl in an old-glibc container (Steam Runtime "sniper" or Ubuntu 22.04), cached
-  per tag.
-- Bundle python-build-standalone with tornado, pyyaml and crypt-r installed.
-- Ship as electron-builder `extraResources`: `crawl/` (binary, `dat/`, `webserver/`),
-  `python/`, `server/`.
-- Expected AppImage size: about 250 MB.
-- GPL: the About screen and README link the exact upstream tag as the source.
+### 5. Packaging ✅ done (pending the first CI run)
+- `scripts/build-crawl.sh` builds DCSS in an `ubuntu:22.04` container, so the newest glibc
+  symbol it needs is 2.34. The Steam Runtime image would be nicer, but its registry is
+  unreachable from the dev sandbox; revisit if needed.
+- `scripts/bundle-offline.sh` assembles `bundle/`:
+  - `crawl/` (74 MB): the stripped binary, `dat/`, `docs/`, `settings/` and the webserver,
+    plus `lib/` with the ncurses libraries it links. `deck_server.py` points crawl at them
+    with `LD_LIBRARY_PATH`, since not every distro ships `libtinfo`.
+  - `python/` (60 MB): python-build-standalone 3.12.11 (pre-stripped, pinned by SHA-256)
+    with tornado and pyyaml. Unused parts (Tk, tests, pip, headers, the shared libpython)
+    are removed, and everything is precompiled, because the AppImage is read-only.
+- `electron-builder.yml` copies `bundle/crawl`, `bundle/python` and `server/` into
+  `resources/`. `npm run dist` refuses to build without the bundle.
+- The AppImage is **179 MB**.
+- CI (`.github/workflows/build.yml`) runs everything in `ubuntu:22.04` and caches the DCSS
+  build and the Python download.
+- Tested here: the AppImage, run with no path overrides, starts the bundled server and goes
+  through launcher → Play offline → character creation → in game → the help screen (which
+  reads the bundled docs). The full save/quit/crash/retry run also passed against `bundle/`.
 
 ### 6. End-to-end tests
 - Make the spike's script (`/tmp`-only for now) into a proper test with Playwright's Electron

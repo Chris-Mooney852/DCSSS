@@ -45,7 +45,15 @@ npm run setup:offline   # optional: build DCSS 0.34.1 for offline play (~3 min)
 npm start          # build and run
 npm test           # unit tests
 npm run typecheck
-npm run dist       # build release/DCSS-Deck-<version>-x86_64.AppImage
+```
+
+Building the AppImage needs the offline bundle. CI builds it in an `ubuntu:22.04` container,
+so the binary runs on any current SteamOS. To do the same locally:
+
+```sh
+docker run --rm -v "$PWD":/repo -w /repo ubuntu:22.04 sh -c \
+  'scripts/install-build-deps.sh && scripts/build-crawl.sh && scripts/bundle-offline.sh'
+npm run dist       # release/DCSS-Deck-<version>-x86_64.AppImage (~180 MB)
 ```
 
 ## Installing on a Steam Deck
@@ -56,6 +64,7 @@ No Steamworks account is needed.
    the **Actions** tab. Right-click it → Properties → Permissions → mark it executable.
 2. In Steam: **Games → Add a Non-Steam Game to My Library**, and pick the AppImage.
 3. Back in **Game Mode**, launch it from your library. It runs fullscreen on the Deck.
+   **Play offline** needs no internet. Saves live in `~/.local/share/dcss-deck/`.
 4. Optional: in the game's controller settings, start from the **Gamepad** template and
    remap anything you like.
 

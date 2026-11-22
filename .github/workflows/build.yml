@@ -4,19 +4,46 @@ on:
   push:
   pull_request:
 
+env:
+  CRAWL_TAG: "0.34.1"
+
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    # Build in Ubuntu 22.04 (glibc 2.35) so the bundled DCSS binary runs on any current SteamOS.
+    container: ubuntu:22.04
     steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update -q && apt-get install -y -q --no-install-recommends git ca-certificates
       - uses: actions/checkout@v4
+      - run: scripts/install-build-deps.sh
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
+      - name: Cache DCSS build
+        uses: actions/cache@v4
+        with:
+          path: build/crawl-${{ env.CRAWL_TAG }}
+          key: crawl-${{ env.CRAWL_TAG }}-jammy-${{ hashFiles('scripts/build-crawl.sh') }}
+      - name: Cache downloads
+        uses: actions/cache@v4
+        with:
+          path: build/cache
+          key: downloads-${{ hashFiles('scripts/bundle-offline.sh') }}
+
+      - name: Build DCSS (webtiles)
+        run: scripts/build-crawl.sh "$CRAWL_TAG" "build/crawl-$CRAWL_TAG"
+      - name: Bundle offline play
+        run: scripts/bundle-offline.sh "build/crawl-$CRAWL_TAG/crawl-ref/source"
+
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
       - run: npm run dist
+
       - uses: actions/upload-artifact@v4
         with:
           name: DCSS-Deck-AppImage

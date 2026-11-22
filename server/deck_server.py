@@ -74,6 +74,7 @@ games = collections.OrderedDict([
         morgue_url = None,
         show_save_info = True,
         allowed_with_hold = True,
+        env = {env!r},
     )),
 ])
 '''
@@ -89,6 +90,15 @@ def crawl_version(crawl_dir: str) -> str:
     except OSError:
         pass
     return "local"
+
+
+def crawl_env(crawl_dir: str) -> dict:
+    """Bundled builds ship the libraries crawl links (ncurses) in <crawl>/lib."""
+    lib = os.path.join(crawl_dir, "lib")
+    if not os.path.isdir(lib):
+        return {}
+    existing = os.environ.get("LD_LIBRARY_PATH")
+    return {"LD_LIBRARY_PATH": lib + (":" + existing if existing else "")}
 
 
 def socket_dir() -> str:
@@ -131,6 +141,7 @@ def main() -> None:
     with open(config_path, "w", encoding="utf-8") as f:
         f.write(CONFIG_TEMPLATE.format(
             user=args.user, port=args.port, data=data, crawl=crawl, sockets=sockets,
+            env=crawl_env(crawl),
             init=os.path.join(here, "init-player.sh"),
             game_id=GAME_ID, version=crawl_version(crawl),
         ))

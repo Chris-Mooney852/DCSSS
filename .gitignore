@@ -4,3 +4,4 @@ release/
 *.AppImage
 build/
 server/__pycache__/
+bundle/
