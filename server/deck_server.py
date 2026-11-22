@@ -140,6 +140,7 @@ def main() -> None:
     import webtiles.server
     from webtiles import userdb
 
+    sys.dont_write_bytecode = True  # keep __pycache__ out of the data dir
     spec = importlib.util.spec_from_file_location("deck_config", config_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules["deck_config"] = module
@@ -157,7 +158,7 @@ def main() -> None:
             sys.exit(f"could not create local player: {err}")
 
     # Lets the app know the server is ready (see src/main/local-server.ts).
-    print(f"DCSS_DECK_READY game={GAME_ID} port={args.port}", flush=True)
+    print(f"DCSS_DECK_READY game={GAME_ID} port={args.port} version={crawl_version(crawl)}", flush=True)
     sys.argv = [sys.argv[0], "--no-daemon", "--no-pidfile", "--logfile", "-"]
     webtiles.server.run()
 

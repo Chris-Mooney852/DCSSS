@@ -3,7 +3,7 @@
 A controller-first client for [Dungeon Crawl Stone Soup](https://github.com/crawl/crawl)
 webtiles, built for the Steam Deck.
 
-- Plays on the public webtiles servers.
+- Plays offline on the device, or online on the public webtiles servers.
 - Caves of Qud-style movement: aim with the left stick, press A to step.
 - Controls change with what's on screen (exploring, targeting, menus, prompts, text
   entry), based on the game's own webtiles protocol messages.
@@ -25,6 +25,8 @@ Steam Input ──► virtual Xbox pad ──► Gamepad API (preload) ──►
 | Path | What it does |
 |---|---|
 | `src/main/main.ts` | Electron main process: window, launcher, sends key events into the page |
+| `src/main/local-server.ts` | Starts and supervises the offline DCSS server |
+| `server/` | Wrapper that runs the upstream webtiles server as a private local server |
 | `src/preload/preload.ts` | Polls the gamepad, works out the context, draws the overlay |
 | `src/preload/page-hook.ts` | Injected into the page; forwards webtiles `comm` messages |
 | `src/shared/stick.ts` | 8-way stick aiming with deadzone and hysteresis |
@@ -39,6 +41,7 @@ Needs Node 22. Any Xbox-style controller works for testing on a PC.
 
 ```sh
 npm install
+npm run setup:offline   # optional: build DCSS 0.34.1 for offline play (~3 min)
 npm start          # build and run
 npm test           # unit tests
 npm run typecheck
@@ -66,7 +69,7 @@ and `scp` new builds across.
 - [x] Controls that change per screen (map / targeting / menus / prompts / text)
 - [ ] Highlight the aimed tile on the map itself, not just the compass
 - [ ] Radial menus for spells, abilities and quivered items
-- [ ] Offline play (see [docs/PLAN-offline.md](docs/PLAN-offline.md)): bundle a `crawl` build with `WEBTILES=y` plus the Python webtiles
+- [ ] Offline play (in progress, see [docs/PLAN-offline.md](docs/PLAN-offline.md)): bundle a `crawl` build with `WEBTILES=y` plus the Python webtiles
       server, running on localhost
 - [ ] Build the AppImage inside the Steam Runtime container
 - [ ] In-app settings (deadzone, repeat speed, hints on/off)

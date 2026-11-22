@@ -4,6 +4,7 @@
 import { contextBridge, ipcRenderer, webFrame } from "electron";
 import { ContextTracker, type DomFacts, type ProtocolMessage } from "../shared/context";
 import { Controller, type PadSnapshot } from "../shared/controller";
+import type { DeckApi } from "../shared/ipc";
 import { Overlay } from "./overlay";
 import { HOOK_TAG, PAGE_HOOK_SOURCE } from "./page-hook";
 
@@ -11,10 +12,13 @@ const isLauncher = location.protocol === "file:";
 
 if (isLauncher) {
   // Only the local launcher page gets an API; remote server pages get nothing.
-  contextBridge.exposeInMainWorld("deck", {
+  const api: DeckApi = {
+    info: () => ipcRenderer.invoke("dcss:info"),
+    playOffline: () => ipcRenderer.invoke("dcss:play-offline"),
     open: (url: string) => ipcRenderer.send("dcss:open", url),
     quit: () => ipcRenderer.send("dcss:quit"),
-  });
+  };
+  contextBridge.exposeInMainWorld("deck", api);
 } else {
   void webFrame.executeJavaScript(PAGE_HOOK_SOURCE);
 }
@@ -26,7 +30,10 @@ const overlay = new Overlay();
 window.addEventListener("message", (e) => {
   if (e.source !== window) return;
   const data = e.data as { [HOOK_TAG]?: boolean; message?: ProtocolMessage } | null;
-  if (data && data[HOOK_TAG] && data.message) tracker.handle(data.message);
+  if (!data || !data[HOOK_TAG] || !data.message) return;
+  tracker.handle(data.message);
+  // The main process decides what to do (offline: back to the launcher).
+  if (data.message.msg === "game_ended") ipcRenderer.send("dcss:game-ended");
 });
 
 function domFacts(): DomFacts {

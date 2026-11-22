@@ -10,7 +10,8 @@
     "start": "npm run build && electron .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "dist": "npm run build && electron-builder --linux AppImage"
+    "dist": "npm run build && electron-builder --linux AppImage",
+    "setup:offline": "scripts/setup-offline.sh"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

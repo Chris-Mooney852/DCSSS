@@ -45,14 +45,23 @@ Problems found and fixed during the spike:
 - `game_started` can arrive before the page hook attaches, so "are we in a game?" now comes
   from which layer the page shows (`#lobby` / `#loader`), not from messages.
 
-### 2. Local server manager (`src/main/local-server.ts`)
-- Pick a free port and spawn `deck_server.py`. Wait for its `DCSS_DECK_READY` line, then load
+### 2. Local server manager ✅ done
+- `src/main/local-server.ts` picks a free port and spawns `deck_server.py`. It waits for the
+  `DCSS_DECK_READY` line and for the port to accept connections, then the app loads
   `http://127.0.0.1:<port>/#play-dcss-deck`.
-- Kill it on quit. If it exits unexpectedly, show an error page with the last log lines and
-  a Retry button.
-- Write logs to `~/.local/share/dcss-deck/logs/` and rotate them.
-- After save and quit or death, the server's lobby appears. In offline mode, catch that and
-  go back to the app's launcher (or straight into a new game).
+- The server stops when the app quits. If it dies, the launcher shows an error box with the
+  last 60 log lines, and Play offline acts as Retry.
+- Logs go to `<data dir>/logs/server-*.log`; the newest 5 are kept.
+- After save and quit or death (the `game_ended` message), the app returns to its launcher
+  instead of the server's lobby.
+- Fixed: the webtiles client's "leave this page?" handler silently blocked navigation back
+  to the launcher, also from View + Menu. The app now ignores it; the server saves the game
+  when the connection closes.
+- Paths are set in `src/main/paths.ts`, with `DCSS_DECK_*` environment overrides.
+- Tests: `test/local-server.test.ts` covers startup, a startup crash, a timeout, a crash while
+  running, a missing build and log rotation, using a fake server. An end-to-end run against
+  the real game covered launcher → play → character creation → save and quit → launcher →
+  resume → server killed → error screen → retry → quit with no processes left behind.
 
 ### 3. Controller-friendly defaults (`server/deck-default.rc`)
 - Started: `easy_confirm = all`.

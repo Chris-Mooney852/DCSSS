@@ -9,12 +9,34 @@
 <body>
   <main>
     <h1>DCSS Deck</h1>
-    <p class="sub">Pick a webtiles server. D-pad or left stick to move, A to select. View + Menu returns here at any time.</p>
-    <ul id="servers"></ul>
-    <form id="custom">
-      <input id="custom-url" type="url" placeholder="Custom server URL (Steam + X for keyboard)">
-      <button type="submit">Connect</button>
-    </form>
+    <p class="sub">D-pad or left stick to move, A to select. View + Menu returns here at any time.</p>
+
+    <section id="error" class="error" hidden>
+      <h2>Something went wrong</h2>
+      <p id="error-message"></p>
+      <details>
+        <summary>Server log</summary>
+        <pre id="error-log"></pre>
+      </details>
+      <p class="hint">Your saves are kept in <code id="data-dir"></code>.</p>
+    </section>
+
+    <section id="offline-section" hidden>
+      <h2>Play offline</h2>
+      <button id="play-offline" class="server offline">
+        <span>Play DCSS <span id="offline-version"></span></span><small id="offline-status">On this device</small>
+      </button>
+    </section>
+
+    <section>
+      <h2>Play online</h2>
+      <ul id="servers"></ul>
+      <form id="custom">
+        <input id="custom-url" type="url" placeholder="Custom server URL (Steam + X for keyboard)">
+        <button type="submit">Connect</button>
+      </form>
+    </section>
+
     <button id="quit" class="quit">Quit</button>
   </main>
   <script src="launcher.js"></script>
