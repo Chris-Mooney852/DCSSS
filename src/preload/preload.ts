@@ -40,7 +40,12 @@ function domFacts(): DomFacts {
   const textFocused =
     active instanceof HTMLTextAreaElement ||
     (active instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit"].includes(active.type));
-  return { uiPopups, legacyMenu, textFocused };
+  // The client shows one layer at a time: #lobby, #loader, or a game layer (#normal, #crt).
+  const lobbyVisible = ["lobby", "loader"].some((id) => {
+    const el = document.getElementById(id);
+    return !!el && el.offsetParent !== null;
+  });
+  return { lobbyVisible, uiPopups, legacyMenu, textFocused };
 }
 
 function readPad(): PadSnapshot | null {
@@ -55,8 +60,12 @@ function readPad(): PadSnapshot | null {
 
 function tick(now: number): void {
   const pad = readPad();
+  const context = isLauncher ? "lobby" : tracker.current(domFacts());
+  // Exposed for end-to-end tests and debugging (visible in devtools).
+  if (document.documentElement.dataset.deckContext !== context) {
+    document.documentElement.dataset.deckContext = context;
+  }
   if (pad) {
-    const context = isLauncher ? "lobby" : tracker.current(domFacts());
     const result = controller.frame(pad, context, now);
     for (const action of result.actions) {
       if (action.type === "key") ipcRenderer.send("dcss:key", action.stroke);

@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { ContextTracker, MouseMode } from "../src/shared/context";
 
-const dom = { uiPopups: 0, legacyMenu: false, textFocused: false };
+const dom = { lobbyVisible: false, uiPopups: 0, legacyMenu: false, textFocused: false };
+const lobby = { ...dom, lobbyVisible: true };
 
 describe("ContextTracker", () => {
-  it("starts in the lobby", () => {
-    expect(new ContextTracker().current(dom)).toBe("lobby");
+  it("is in the lobby while the lobby or loader is showing", () => {
+    expect(new ContextTracker().current(lobby)).toBe("lobby");
+  });
+
+  it("detects menus even if game_started was missed (e.g. character creation)", () => {
+    expect(new ContextTracker().current({ ...dom, uiPopups: 1 })).toBe("menu");
   });
 
   it("follows input_mode once a game starts", () => {
@@ -28,10 +33,10 @@ describe("ContextTracker", () => {
     expect(t.current(dom)).toBe("map");
   });
 
-  it("returns to the lobby when the game ends", () => {
+  it("resets the targeting mode when a game ends", () => {
     const t = new ContextTracker();
-    t.handle({ msg: "game_started" });
+    t.handle({ msg: "input_mode", mode: MouseMode.TARGET });
     t.handle({ msg: "game_ended" });
-    expect(t.current(dom)).toBe("lobby");
+    expect(t.current(dom)).toBe("map");
   });
 });

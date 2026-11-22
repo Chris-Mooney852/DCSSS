@@ -31,6 +31,8 @@ export interface ProtocolMessage {
 
 /** Facts the preload reads from the page each frame. */
 export interface DomFacts {
+  /** The webtiles lobby, login prompt or loading screen is showing (not in a game). */
+  lobbyVisible: boolean;
   /** Number of visible popups in #ui-stack. */
   uiPopups: number;
   /** A legacy #menu element is visible. */
@@ -40,26 +42,21 @@ export interface DomFacts {
 }
 
 export class ContextTracker {
-  private inGame = false;
   private mouseMode: number = MouseMode.NORMAL;
   private textInput = false;
 
   handle(m: ProtocolMessage): void {
     switch (m.msg) {
+      // Whether we're in a game comes from the DOM (see DomFacts.lobbyVisible): these
+      // messages can arrive before the page hook is attached.
       case "game_started":
-        this.inGame = true;
-        this.mouseMode = MouseMode.NORMAL;
-        break;
       case "game_ended":
       case "go_lobby":
-        this.inGame = false;
+        this.mouseMode = MouseMode.NORMAL;
         this.textInput = false;
         break;
       case "input_mode":
-        if (typeof m.mode === "number") {
-          this.mouseMode = m.mode;
-          this.inGame = true;
-        }
+        if (typeof m.mode === "number") this.mouseMode = m.mode;
         break;
       case "init_input":
         this.textInput = true;
@@ -72,7 +69,7 @@ export class ContextTracker {
 
   current(dom: DomFacts): InputContext {
     if (dom.textFocused || this.textInput) return "text";
-    if (!this.inGame) return "lobby";
+    if (dom.lobbyVisible) return "lobby";
     if (dom.uiPopups > 0 || dom.legacyMenu) return "menu";
     switch (this.mouseMode) {
       case MouseMode.TARGET:

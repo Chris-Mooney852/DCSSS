@@ -66,7 +66,7 @@ and `scp` new builds across.
 - [x] Controls that change per screen (map / targeting / menus / prompts / text)
 - [ ] Highlight the aimed tile on the map itself, not just the compass
 - [ ] Radial menus for spells, abilities and quivered items
-- [ ] Offline play: bundle a `crawl` build with `WEBTILES=y` plus the Python webtiles
+- [ ] Offline play (see [docs/PLAN-offline.md](docs/PLAN-offline.md)): bundle a `crawl` build with `WEBTILES=y` plus the Python webtiles
       server, running on localhost
 - [ ] Build the AppImage inside the Steam Runtime container
 - [ ] In-app settings (deadzone, repeat speed, hints on/off)
