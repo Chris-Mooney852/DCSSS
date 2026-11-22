@@ -92,11 +92,29 @@ Problems found and fixed during the spike:
   through launcher → Play offline → character creation → in game → the help screen (which
   reads the bundled docs). The full save/quit/crash/retry run also passed against `bundle/`.
 
-### 6. End-to-end tests
-- Make the spike's script (`/tmp`-only for now) into a proper test with Playwright's Electron
-  support, run against the bundled server.
-- Add a fake gamepad, so tests drive the real controller code, not raw keys.
-- Run it in CI.
+### 6. End-to-end tests ✅ done
+- `e2e/` uses Playwright's Electron support to launch the real app. Each test gets a fresh
+  profile and data dir, and the bundled server (or the dev build).
+- A **simulated gamepad** (`e2e/harness.ts`) feeds pad states through the
+  `dcss:simulated-pad` IPC channel. The app's real controller code turns them into keys.
+  Only the main process can send on that channel; web pages can't reach it.
+- Checks go through the game itself, e.g. the in-game turn counter (`#stats_time`)
+  proves that stick + A took a step and that aiming alone did not.
+- Coverage:
+  - character creation with the stick and A;
+  - Qud-style movement;
+  - R3 wait;
+  - LB inventory and B back;
+  - View look mode with the stick moving the cursor;
+  - the LT layer (LT + Menu = save and quit) back to the launcher, then resuming the same
+    game;
+  - View + Menu from a running game;
+  - a server crash: error box, then Retry.
+- Runs in CI under `xvfb-run` in the `ubuntu:22.04` container, before the AppImage is
+  built. The whole pipeline was verified in that image locally; 3 tests, about 40 s, stable
+  across repeated runs.
+- Also fixed: the page hook now stops the client from registering its "leave this page?"
+  handler at all, on top of the main process ignoring it.
 
 ## Risks
 - **Upstream bit-rot:** the webtiles client or protocol can change between versions. The

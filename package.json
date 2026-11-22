@@ -12,9 +12,11 @@
     "test": "vitest run",
     "dist": "npm run build && node scripts/check-bundle.mjs && electron-builder --linux AppImage --publish never",
     "setup:offline": "scripts/setup-offline.sh",
-    "bundle:offline": "scripts/bundle-offline.sh"
+    "bundle:offline": "scripts/bundle-offline.sh",
+    "test:e2e": "npm run build && playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@types/node": "^22.10.0",
     "electron": "^45.4.1",
     "electron-builder": "^26.18.0",

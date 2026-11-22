@@ -55,7 +55,15 @@ function domFacts(): DomFacts {
   return { lobbyVisible, uiPopups, legacyMenu, textFocused };
 }
 
+// A simulated pad, used by the end-to-end tests. Only the main process can send this
+// (webContents.send); web pages have no way to reach it.
+let simulatedPad: PadSnapshot | null = null;
+ipcRenderer.on("dcss:simulated-pad", (_e, pad: PadSnapshot | null) => {
+  simulatedPad = pad;
+});
+
 function readPad(): PadSnapshot | null {
+  if (simulatedPad) return simulatedPad;
   // Use the first connected pad. Under Steam Input this is Steam's virtual controller.
   for (const pad of navigator.getGamepads()) {
     if (pad && pad.connected) {

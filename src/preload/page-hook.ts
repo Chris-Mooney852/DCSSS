@@ -16,6 +16,15 @@ export const FORWARDED_MESSAGES = [
 export const PAGE_HOOK_SOURCE = `(() => {
   if (window.${HOOK_TAG}Hooked) return;
   window.${HOOK_TAG}Hooked = true;
+  // The client asks "leave this page?" while a game runs. Leaving is safe (the server
+  // saves when the connection closes) and the prompt would block returning to the
+  // launcher, so never let the page register it.
+  const addListener = window.addEventListener;
+  window.addEventListener = function (type, ...rest) {
+    if (type === "beforeunload") return;
+    return addListener.call(this, type, ...rest);
+  };
+  Object.defineProperty(window, "onbeforeunload", { set() {}, get() { return null; } });
   const wanted = new Set(${JSON.stringify(FORWARDED_MESSAGES)});
   const forward = (m) => {
     if (m && typeof m === "object" && wanted.has(m.msg)) {

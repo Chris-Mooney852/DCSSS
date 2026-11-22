@@ -17,6 +17,9 @@ const PRELOAD = path.join(__dirname, "../preload/preload.js");
 /** Steam sets SteamDeck=1 when running on a Deck; --fullscreen forces it elsewhere. */
 const fullscreen = process.env.SteamDeck === "1" || process.argv.includes("--fullscreen");
 
+// Lets tests (and side-by-side installs) use their own browser profile.
+if (process.env.DCSS_DECK_USER_DATA_DIR) app.setPath("userData", process.env.DCSS_DECK_USER_DATA_DIR);
+
 const paths = offlinePaths({
   packaged: app.isPackaged,
   resourcesPath: process.resourcesPath,

@@ -44,6 +44,7 @@ npm install
 npm run setup:offline   # optional: build DCSS 0.34.1 for offline play (~3 min)
 npm start          # build and run
 npm test           # unit tests
+npm run test:e2e   # end-to-end: real app + offline DCSS, simulated gamepad (needs a display)
 npm run typecheck
 ```
 
@@ -78,9 +79,10 @@ and `scp` new builds across.
 - [x] Controls that change per screen (map / targeting / menus / prompts / text)
 - [ ] Highlight the aimed tile on the map itself, not just the compass
 - [ ] Radial menus for spells, abilities and quivered items
-- [ ] Offline play (in progress, see [docs/PLAN-offline.md](docs/PLAN-offline.md)): bundle a `crawl` build with `WEBTILES=y` plus the Python webtiles
-      server, running on localhost
-- [ ] Build the AppImage inside the Steam Runtime container
+- [x] Offline play: DCSS 0.34.1 and its webtiles server bundled, running on localhost
+      ([docs/PLAN-offline.md](docs/PLAN-offline.md))
+- [x] End-to-end tests against the real game with a simulated gamepad, in CI
+- [ ] Build in the Steam Runtime container instead of Ubuntu 22.04 (optional)
 - [ ] In-app settings (deadzone, repeat speed, hints on/off)
 
 ## License
