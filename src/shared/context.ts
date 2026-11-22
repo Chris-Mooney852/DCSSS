@@ -16,6 +16,7 @@ export const MouseMode = {
 
 export type InputContext =
   | "lobby"   // server lobby / login screen, not in a game
+  | "loading" // game page showing, but the game isn't accepting commands yet
   | "map"     // normal play: move, act
   | "target"  // choosing a target or direction
   | "menu"    // a menu or UI popup is open
@@ -43,6 +44,8 @@ export interface DomFacts {
 
 export class ContextTracker {
   private mouseMode: number = MouseMode.NORMAL;
+  /** The game has told us its input mode, so it is ready for commands. */
+  private ready = false;
   private textInput = false;
 
   handle(m: ProtocolMessage): void {
@@ -54,9 +57,13 @@ export class ContextTracker {
       case "go_lobby":
         this.mouseMode = MouseMode.NORMAL;
         this.textInput = false;
+        this.ready = false;
         break;
       case "input_mode":
-        if (typeof m.mode === "number") this.mouseMode = m.mode;
+        if (typeof m.mode === "number") {
+          this.mouseMode = m.mode;
+          this.ready = true;
+        }
         break;
       case "init_input":
         this.textInput = true;
@@ -71,6 +78,7 @@ export class ContextTracker {
     if (dom.textFocused || this.textInput) return "text";
     if (dom.lobbyVisible) return "lobby";
     if (dom.uiPopups > 0 || dom.legacyMenu) return "menu";
+    if (!this.ready) return "loading";
     switch (this.mouseMode) {
       case MouseMode.TARGET:
       case MouseMode.TARGET_DIR:

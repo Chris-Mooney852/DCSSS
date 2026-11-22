@@ -13,9 +13,19 @@ describe("ContextTracker", () => {
     expect(new ContextTracker().current({ ...dom, uiPopups: 1 })).toBe("menu");
   });
 
+  it("is loading until the game reports an input mode", () => {
+    const t = new ContextTracker();
+    expect(t.current(dom)).toBe("loading");
+    t.handle({ msg: "input_mode", mode: MouseMode.COMMAND });
+    expect(t.current(dom)).toBe("map");
+    t.handle({ msg: "game_ended" });
+    expect(t.current(dom)).toBe("loading");
+  });
+
   it("follows input_mode once a game starts", () => {
     const t = new ContextTracker();
     t.handle({ msg: "game_started" });
+    t.handle({ msg: "input_mode", mode: MouseMode.NORMAL });
     expect(t.current(dom)).toBe("map");
     t.handle({ msg: "input_mode", mode: MouseMode.TARGET });
     expect(t.current(dom)).toBe("target");
@@ -25,7 +35,7 @@ describe("ContextTracker", () => {
 
   it("prioritises text input, then menus", () => {
     const t = new ContextTracker();
-    t.handle({ msg: "game_started" });
+    t.handle({ msg: "input_mode", mode: MouseMode.COMMAND });
     expect(t.current({ ...dom, uiPopups: 1 })).toBe("menu");
     t.handle({ msg: "init_input" });
     expect(t.current({ ...dom, uiPopups: 1 })).toBe("text");
@@ -37,6 +47,7 @@ describe("ContextTracker", () => {
     const t = new ContextTracker();
     t.handle({ msg: "input_mode", mode: MouseMode.TARGET });
     t.handle({ msg: "game_ended" });
+    t.handle({ msg: "input_mode", mode: MouseMode.COMMAND });
     expect(t.current(dom)).toBe("map");
   });
 });

@@ -43,11 +43,46 @@ export const PAGE_HOOK_SOURCE = `(() => {
       return handled;
     };
   };
-  const timer = setInterval(() => {
+  // Game modules are loaded per version, e.g. "game-<hash>/player".
+  const gameModule = (name) => {
     const req = window.require;
-    if (typeof req === "function" && req.defined && req.defined("comm")) {
-      clearInterval(timer);
-      patch(req("comm"));
+    const defined = req && req.s && req.s.contexts && req.s.contexts._ && req.s.contexts._.defined;
+    if (!defined) return null;
+    const id = Object.keys(defined).find((k) => k.endsWith("/" + name));
+    return id ? defined[id] : null;
+  };
+  window.${HOOK_TAG}Module = gameModule;
+
+  // Requests from the app's preload (radial menus).
+  window.addEventListener("message", (e) => {
+    const req = e.source === window && e.data && e.data.${HOOK_TAG}Request;
+    if (!req) return;
+    const reply = (data) => window.postMessage({ ${HOOK_TAG}: true, reply: req.type, id: req.id, data }, "*");
+    try {
+      if (req.type === "inventory") {
+        const player = gameModule("player");
+        const inv = player && player.inv ? Object.values(player.inv) : [];
+        reply(JSON.parse(JSON.stringify(inv)));
+      } else if (req.type === "item-action" && typeof req.slot === "number") {
+        // Same as clicking an item in the client's consumables panel.
+        window.require("comm").send_message("inv_item_action", { slot: req.slot });
+        reply(true);
+      }
+    } catch (err) {
+      reply(null);
+    }
+  });
+  let lastMode;
+  setInterval(() => {
+    const req = window.require;
+    if (typeof req === "function" && req.defined && req.defined("comm")) patch(req("comm"));
+    // Also report the current input mode directly, in case its message arrived before
+    // the hook was attached (the app waits for it before accepting commands).
+    const game = gameModule("game");
+    const mode = game && typeof game.get_input_mode === "function" ? game.get_input_mode() : undefined;
+    if (typeof mode === "number" && mode !== lastMode) {
+      lastMode = mode;
+      forward({ msg: "input_mode", mode });
     }
   }, 200);
 })();`;

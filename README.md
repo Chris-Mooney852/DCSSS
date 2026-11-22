@@ -5,6 +5,7 @@ webtiles, built for the Steam Deck.
 
 - Plays offline on the device, or online on the public webtiles servers.
 - Caves of Qud-style movement: aim with the left stick, press A to step.
+- Radial menus for items, spells, abilities and common commands.
 - Controls change with what's on screen (exploring, targeting, menus, prompts, text
   entry), based on the game's own webtiles protocol messages.
 - Steam Input works fully: remap buttons, back paddles and gyro in Steam's layout editor.
@@ -78,7 +79,8 @@ and `scp` new builds across.
 - [x] Caves of Qud-style movement, direction compass and button hints
 - [x] Controls that change per screen (map / targeting / menus / prompts / text)
 - [ ] Highlight the aimed tile on the map itself, not just the compass
-- [ ] Radial menus for spells, abilities and quivered items
+- [x] Radial menus: hold LB (items), RB (spells), View (abilities), Menu (commands)
+- [ ] Item and spell tiles (icons) in the radial menus
 - [x] Offline play: DCSS 0.34.1 and its webtiles server bundled, running on localhost
       ([docs/PLAN-offline.md](docs/PLAN-offline.md))
 - [x] End-to-end tests against the real game with a simulated gamepad, in CI

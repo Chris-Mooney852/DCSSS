@@ -5,6 +5,7 @@
 // complete. Every value is a key DCSS already understands.
 
 import type { InputContext } from "./context";
+import type { RadialKind } from "./radial";
 
 /** Standard Gamepad API button indices (Steam Input presents an Xbox-style pad). */
 export const Btn = {
@@ -31,6 +32,8 @@ export interface Binding {
   repeat?: boolean;
   /** Short label for the on-screen hint bar. */
   label: string;
+  /** Holding the button (instead of tapping it) opens this radial menu. */
+  radial?: RadialKind;
 }
 
 export type Layer = Partial<Record<ButtonName, Binding>>;
@@ -38,6 +41,7 @@ export type Layer = Partial<Record<ButtonName, Binding>>;
 const k = (key: string, label: string, extra: Partial<Binding> & Partial<KeyStroke> = {}): Binding => ({
   stroke: { key, shift: extra.shift, ctrl: extra.ctrl },
   repeat: extra.repeat,
+  radial: extra.radial,
   label,
 });
 
@@ -50,17 +54,18 @@ const arrows: Layer = {
 
 /** Map mode, no modifier held. A + stick (move) and RT (run) are handled in controller.ts. */
 const mapBase: Layer = {
-  B: k("Escape", "Cancel"),
+  // No B here: Escape on the map only prints "Unknown command". Prompts and menus have
+  // their own contexts where B cancels.
   X: k("o", "Explore"),
   Y: k("Tab", "Autofight", { repeat: true }),
-  LB: k("i", "Inventory"),
-  RB: k("z", "Cast"),
+  LB: k("i", "Inventory", { radial: "items" }),
+  RB: k("z", "Cast", { radial: "spells" }),
   Up: k("<", "Go up"),
   Down: k(">", "Go down"),
   Left: k("g", "Pick up"),
   Right: k("5", "Rest"),
-  Back: k("x", "Look"),
-  Start: k("?", "Help"),
+  Back: k("x", "Look", { radial: "abilities" }),
+  Start: k("?", "Help", { radial: "commands" }),
   LS: k("%", "Character"),
   RS: k("s", "Wait", { repeat: true }),
 };
@@ -83,6 +88,8 @@ const mapAlt: Layer = {
 
 export const LAYERS: Record<InputContext, { base: Layer; alt?: Layer }> = {
   map: { base: mapBase, alt: mapAlt },
+  // Nothing to do until the game is ready (View + Menu still returns to the launcher).
+  loading: { base: {} },
   target: {
     base: {
       A: k("Enter", "Confirm"),
@@ -124,4 +131,6 @@ export const CURSOR_CONTEXTS: ReadonlySet<InputContext> = new Set(["target"]);
 export const ARROW_STICK_CONTEXTS: ReadonlySet<InputContext> = new Set(["menu", "prompt", "lobby"]);
 
 export const REPEAT_DELAY_MS = 300;
+/** Holding a radial button this long opens its radial; a shorter press is a tap. */
+export const RADIAL_HOLD_MS = 250;
 export const REPEAT_INTERVAL_MS = 120;

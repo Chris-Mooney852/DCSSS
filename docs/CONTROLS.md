@@ -22,18 +22,34 @@ holding.
 |---|---|---|
 | Left stick + A | Step | `hjklyubn` |
 | Left stick + RT + A | Run | `HJKLYUBN` |
-| B | Cancel | Esc |
 | X | Autoexplore | `o` |
 | Y (hold to repeat) | Autofight | Tab |
-| LB | Inventory | `i` |
-| RB | Cast spell | `z` |
+| LB | Inventory (hold: **item radial**) | `i` |
+| RB | Cast spell (hold: **spell radial**) | `z` |
 | D-pad ↑ / ↓ | Stairs up / down | `<` / `>` |
 | D-pad ← | Pick up | `g` |
 | D-pad → | Rest | `5` |
-| View | Look around | `x` |
-| Menu | Help / command list | `?` |
+| View | Look around (hold: **ability radial**) | `x` |
+| Menu | Help / command list (hold: **command radial**) | `?` |
 | L3 | Character overview | `%` |
 | R3 (hold to repeat) | Wait a turn | `s` |
+
+### Radial menus
+
+Hold LB, RB, View or Menu for a moment and a wheel opens in the middle of the screen.
+Point at an entry with the left stick and **let go of the button** to use it. A also
+picks the highlighted entry, and B cancels. With more than 8 entries, D-pad ← → turns
+the page. A quick tap of the same buttons still does their normal action.
+
+| Hold | Wheel | What choosing an entry does |
+|---|---|---|
+| LB | **Items**: potions, scrolls, wands, throwing items… (the same list as the game's consumables panel) | Uses the item's default action (drink, read, evoke, throw) |
+| RB | **Spells** you know, with failure chance | Casts it, continuing into targeting where needed |
+| View | **Abilities** | Uses it |
+| Menu | **Commands**: level map, skills, character, messages, travel, pray, find, spell list | Runs the command |
+
+You can let go of the stick and the button at the same moment; the wheel remembers
+what you were pointing at.
 
 ### Hold LT for more actions
 

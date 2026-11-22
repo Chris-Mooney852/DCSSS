@@ -35,9 +35,18 @@ export interface Deck {
   close(): Promise<void>;
 }
 
-export async function launch(): Promise<Deck> {
+export interface LaunchOptions {
+  /** Contents for the player's rc file, e.g. to skip character creation. */
+  rc?: string;
+}
+
+export async function launch(opts: LaunchOptions = {}): Promise<Deck> {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "dcss-deck-e2e-"));
   const dataDir = path.join(tmp, "data");
+  if (opts.rc !== undefined) {
+    fs.mkdirSync(path.join(dataDir, "rcs"), { recursive: true });
+    fs.writeFileSync(path.join(dataDir, "rcs", "Player.rc"), opts.rc);
+  }
   const app = await electron.launch({
     args: [ROOT, "--no-sandbox"],
     env: {
