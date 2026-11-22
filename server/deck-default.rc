@@ -1,0 +1,7 @@
+# DCSS Deck default options, tuned for playing with a controller.
+# This file is copied once, the first time you play. Edit it freely afterwards:
+# it lives in ~/.local/share/dcss-deck/rcs/ and DCSS Deck never overwrites it.
+# Every option is documented in the DCSS options guide (docs/options_guide.txt).
+
+# Let A ("y") answer every confirmation, including ones that normally need a capital Y.
+easy_confirm = all

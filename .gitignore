@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+*.AppImage
+build/
+server/__pycache__/
+bundle/
+test-results/
+playwright-report/
