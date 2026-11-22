@@ -10,7 +10,7 @@
     "start": "npm run build && electron .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "dist": "npm run build && node scripts/check-bundle.mjs && electron-builder --linux AppImage",
+    "dist": "npm run build && node scripts/check-bundle.mjs && electron-builder --linux AppImage --publish never",
     "setup:offline": "scripts/setup-offline.sh",
     "bundle:offline": "scripts/bundle-offline.sh"
   },
